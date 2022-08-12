@@ -11,10 +11,10 @@
 exn <- function(x,MLE=TRUE) 
 {
 
-   mme <- MM(x)
+   mme <- mmeFtn(x)
    mle <- if (MLE) mleFtn(x) else NULL
 
-   z <- list(mme=mmemle,mle=mle)
+   z <- list(mme=mme,mle=mle)
    class(z) <- 'exNormFit'
    z
 }
