@@ -19,7 +19,7 @@ exn <- function(x,MLE=TRUE)
    z
 }
 
-mmeFtn <- function(x) 
+exNormMMEbase <- function(x) 
 {
    library(moments) 
    m <- mean(x)
@@ -29,18 +29,44 @@ mmeFtn <- function(x)
    mu <- m - s*gam3
    sig2 <- s^2 * (1 - gam3^2)
    tau <- s * gam3
-   list(tau=tau, mu=mu, sig=sqrt(sig2))
+   ests <- c(mu,sqrt(sig2),tau)
+   names(ests) <- c('mu','sig','tau')
+   ests
 }
 
-mleFtn <- function(x) 
+exNormMMEftn <- function(x) jkkn(x,exNormMMEbase)
+
+exNormMLEbase <- function(x) 
 {
    require(limma)
-   mle <- normexp.fit(x)
-   par <- mle$par
-   mle$tau <- exp(par[3])
-   mle$mu <- par[1]
-   mle$sig <- exp(par[2])
-   mle
+   tmp <- normexp.fit(x)
+   par <- tmp$par
+   tau <- exp(par[3])
+   mu <- par[1]
+   sig <- exp(par[2])
+   ests <- c(mu,sig,tau)
+   names(ests) <- c('mu','sig','tau')
+   ests
+}
+
+# unfortunately, limma() does not report standard errors
+exNormMLEftn <- function(x) jkkn(x,exNormMLEbase)
+
+# for testingn
+
+normalFtnBase <- function(x) c(mean(x),sd(x))
+normalFtn <- function(x) jkkn(x,normalFtnBase)
+
+# plot nonparametric, model-based density estimates
+plotExNormFit <- function(x,fit) 
+{
+    require(gamlss.dist) 
+    dx <- density(x)
+    plot(dx)
+    ests <- fit$Tjack
+    f <- function(x) dexGAUS(x,ests[1],ests[2],ests[3])
+    curve(f,min(dx$x),max(dx$x),add=T)
+
 }
 
 rexNorm <- function(n,tau,mu,sig) 
