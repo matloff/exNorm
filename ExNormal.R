@@ -1,24 +1,5 @@
 
-# fit MM est and possible MLE
-
-# arguments:
-
-#    x: data to be fitted
-#    MLE: if TRUE, fit both MM and MLE, otherwise just MM
-
-
-
-exn <- function(x,MLE=TRUE) 
-{
-
-   mme <- mmeFtn(x)
-   mle <- if (MLE) mleFtn(x) else NULL
-
-   z <- list(mme=mme,mle=mle)
-   class(z) <- 'exNormFit'
-   z
-}
-
+# compute Method of Moments estimator, no jackknife
 exNormMMEbase <- function(x) 
 {
    library(moments) 
@@ -33,9 +14,10 @@ exNormMMEbase <- function(x)
    names(ests) <- c('mu','sig','tau')
    ests
 }
-
+# get jackknifed est, plus standard errors
 exNormMMEftn <- function(x) jkkn(x,exNormMMEbase)
 
+# compute MLE, no jackknife
 exNormMLEbase <- function(x) 
 {
    require(limma)
@@ -48,27 +30,33 @@ exNormMLEbase <- function(x)
    names(ests) <- c('mu','sig','tau')
    ests
 }
-
 # unfortunately, limma() does not report standard errors
+# get jackknifed est, plus standard errors
 exNormMLEftn <- function(x) jkkn(x,exNormMLEbase)
 
-# for testingn
+# for testing
 
 normalFtnBase <- function(x) c(mean(x),sd(x))
 normalFtn <- function(x) jkkn(x,normalFtnBase)
 
 # plot nonparametric, model-based density estimates
-plotExNormFit <- function(x,fit) 
+plotFit <- function(x,fit) 
 {
     require(gamlss.dist) 
+    # get nonparametric density estimate, but don't plot yet
     dx <- density(x)
-    plot(dx)
+    # prep to plot fitted model
     ests <- fit$Tjack
     f <- function(x) dexGAUS(x,ests[1],ests[2],ests[3])
-    curve(f,min(dx$x),max(dx$x),add=T)
-
+    crv <- curve(f,min(dx$x),max(dx$x), xlab='fitted model black')
+    # now plot the density estimate
+    plot(dx,ylim=c(0,max(crv$y)),
+       col='blue',main='assessing model fit',xlab='x, fitted model black')
+    # and the fitted model
+    lines(crv)
 }
 
+# generate random numbers, as with runif(), rnorm() etc.
 rexNorm <- function(n,tau,mu,sig) 
 {
    x1 <- rexp(n,1/tau)
