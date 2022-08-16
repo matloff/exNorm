@@ -1,0 +1,7 @@
+
+import('gamlss.dist')
+import('limma')
+
+export(exNormMMEbase,exNormMMEftn,exNormMLEbase,exNormMLEftn,plotFit,rexNorm)
+
+

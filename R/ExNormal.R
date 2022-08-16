@@ -1,4 +1,13 @@
 
+# Method of Moments estimator and MLE for the ex-normal distribution
+# family
+
+# the jackknife is used to get standard errors
+
+# there is also a plot function, superimposing the density of the fitted
+# model with a nonparametric density estimator
+
+
 # compute Method of Moments estimator, no jackknife
 exNormMMEbase <- function(x) 
 {
@@ -20,7 +29,6 @@ exNormMMEftn <- function(x) jkkn(x,exNormMMEbase)
 # compute MLE, no jackknife
 exNormMLEbase <- function(x) 
 {
-   require(limma)
    tmp <- normexp.fit(x)
    par <- tmp$par
    tau <- exp(par[3])
@@ -42,7 +50,6 @@ normalFtn <- function(x) jkkn(x,normalFtnBase)
 # plot nonparametric, model-based density estimates
 plotFit <- function(x,fit) 
 {
-    require(gamlss.dist) 
     # get nonparametric density estimate, but don't plot yet
     dx <- density(x)
     # prep to plot fitted model
@@ -63,12 +70,4 @@ rexNorm <- function(n,tau,mu,sig)
    x2 <- rnorm(n,mu,sig)
    x1 + x2
 }
-
-# to come:
-
-# library(gamlss.dist) 
-# x <- rexNorm(100,3,2,1)
-# plot(density(x))
-# f <- function(x) dexGAUS(x,2,1,3)
-# curve(f,0,25,add=T)
 
